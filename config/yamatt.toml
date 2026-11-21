@@ -14,3 +14,44 @@ exclude_shorts = true
 name = "Save it for Parts"
 id = "UCNLRcEn78Vc62C3GkMvBgtA"
 exclude_shorts = true
+
+[[channels]]
+name = "Corridor Crew"
+id = "UCSpFnDQr88xCZ80N-X7t0nQ"
+exclude_shorts = true
+
+[[channels]]
+name = "Led by Donkeys"
+id = "UCS-rn3PHxRmk8rGz5DVSPJg"
+exclude_shorts = true
+
+[[channels]]
+name = "SFDebris Red"
+id = "UCd18OhMfRmjMjzSHP7Zrzmw"
+exclude_shorts = true
+
+[[channels]]
+name = "Michael Spicer"
+id = "UC9gtLw0B8rZ7aPycaC88N-g"
+exclude_shorts = true
+
+[[channels]]
+name = "Ted Ed"
+id = "UCsooa4yRKGN_zEE8iknghZA"
+exclude_shorts = true
+
+[[channels]]
+name = "Garden Brick Train"
+id = "UCYennEwY2rThfiixZqrQB1A"
+exclude_shorts = true
+
+[[channels]]
+name = "Bobby Fingers"
+id = "UCXKCiTquPMavBqgXgrM9mBg"
+exclude_shorts = true
+
+
+[[channels]]
+name = "Nerd Cubed"
+id = "UCKab3hYnOoTZZbEUQBMx-ww"
+exclude_shorts = true
