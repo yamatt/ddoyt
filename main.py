@@ -16,7 +16,7 @@ HEADERS = {
 }
 
 
-def resolve_feed_url(channel_id: str, exclude_shorts: bool) -> str:
+def get_feed_url(channel_id: str, exclude_shorts: bool) -> str:
     target_id = channel_id.strip()
     if exclude_shorts and target_id.startswith("UC"):
         target_id = f"UULF{target_id[2:]}"
@@ -32,7 +32,7 @@ def fetch_with_retry(client: httpx.Client, url: str, retries: int = 3) -> str | 
             if resp.status_code == 200:
                 return resp.text
             if resp.status_code in {404, 429, 500, 502, 503, 504}:
-                wait = attempt * random.uniform(3.0, 6.0)
+                wait = attempt * random.uniform(3.0, 6.0)  # nosec
                 click.echo(
                     f"HTTP {resp.status_code} for {url} "
                     f"(attempt {attempt}/{retries}), retrying in {wait:.1f}s"
@@ -92,11 +92,9 @@ def build_rss(all_items: list[dict], feed_meta: dict, output_path: Path) -> None
     fg.description(feed_meta.get("description", "Aggregated YouTube channel feed"))
     fg.language(feed_meta.get("language", "en"))
 
-    sorted_items = sorted(all_items, key=lambda x: x["published"], reverse=True)[
-        :max_items
-    ]
+    sorted_items = sorted(all_items, key=lambda x: x["published"])[:max_items]
 
-    for item in reversed(sorted_items):
+    for item in sorted_items:
         fe = fg.add_entry()
         fe.id(item["link"] or item["id"])
         fe.title(item["title"])
@@ -154,15 +152,14 @@ def main(config: Path, output: Path) -> None:
     all_items: list[dict] = []
 
     with httpx.Client(headers=HEADERS, timeout=15.0, follow_redirects=True) as client:
-        for idx, channel in enumerate(channels):
+        for channel in channels:
             channel_id = channel["id"]
             label = channel.get("name", channel_id)
             exclude_shorts = channel.get("exclude_shorts", True)
 
-            if idx > 0:
-                time.sleep(random.uniform(1.5, 3.0))
+            time.sleep(random.uniform(1.5, 3.0))  # nosec
 
-            url = resolve_feed_url(channel_id, exclude_shorts)
+            url = get_feed_url(channel_id, exclude_shorts)
             xml_text = fetch_with_retry(client, url)
             if xml_text:
                 entries = parse_entries(xml_text, fallback_name=label)

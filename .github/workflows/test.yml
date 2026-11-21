@@ -55,7 +55,7 @@ jobs:
       - name: Generate RSS feed
         run: |
           mkdir -p ./out
-          uv run main.py config/test.toml ./out
+          uv run main.py config/test.toml ./out/test.rss
       - name: Validate RSS XML structure (Alpine)
         uses: addnab/docker-run-action@v3
         with:
