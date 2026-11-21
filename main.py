@@ -53,7 +53,7 @@ def fetch_with_retry(client: httpx.Client, url: str, retries: int = 3) -> str | 
 
 def parse_entries(xml_text: str, fallback_name: str | None = None) -> list[dict]:
     parsed = feedparser.parse(xml_text)
-    channel_title = parsed.feed.get("title") or fallback_name or "Unknown Channel"
+    channel_title = parsed.feed.get("author") or fallback_name or "Unknown Channel"
     items = []
 
     for entry in parsed.entries:
@@ -72,7 +72,7 @@ def parse_entries(xml_text: str, fallback_name: str | None = None) -> list[dict]
             {
                 "id": video_id,
                 "channel": channel_title,
-                "title": f"[{channel_title}] {entry.get('title', 'Untitled')}",
+                "title": f"{channel_title} | {entry.get('title', 'Untitled')}",
                 "link": entry.get("link", ""),
                 "published": dt.isoformat(),
                 "summary": entry.get("summary", ""),
