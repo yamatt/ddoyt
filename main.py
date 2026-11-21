@@ -83,7 +83,7 @@ def parse_entries(xml_text: str, fallback_name: str | None = None) -> list[dict]
 
 
 def build_rss(all_items: list[dict], feed_meta: dict, output_path: Path) -> None:
-    max_items = feed_meta.get("max_items", 50)
+    max_items = feed_meta.get("max_items", 25)
 
     fg = FeedGenerator()
     fg.id(feed_meta.get("id", "https://github.com/your-username/youtube-rss"))
