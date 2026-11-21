@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - ".github/workflows/tests.yaml"
+      - ".github/workflows/test.yml"
       - "config/test.toml"
       - "main.py"
       - "tests/**"
