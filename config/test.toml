@@ -1,0 +1,16 @@
+[feed]
+id = "https://yamatt.github.com/ddoyt"
+title = "Favourite YouTube Channels"
+description = "Daily aggregated feed of favourite YouTube channels"
+language = "en"
+max_items = 25
+
+[[channels]]
+name = "Daily Dose Of Internet"
+id = "UCdC0An4ZPNr_YiFiYoVbwaw"
+exclude_shorts = true
+
+[[channels]]
+name = "Google Developers"
+id = "UC_x5XG1OV2P6uZZ5FSM9Ttw"
+exclude_shorts = true

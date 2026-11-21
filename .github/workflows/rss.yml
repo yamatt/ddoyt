@@ -1,0 +1,49 @@
+name: Build RSS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/rss.yaml"
+      - "main.py"
+      - "config/*"
+  workflow_dispatch:
+
+concurrency:
+  group: "{{ github.workflow }}-rss"
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-rss:
+    name: Build RSS feed
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.3.3
+        with:
+          enable-cache: "auto"
+      - name: "Set up Python"
+        uses: actions/setup-python@v7.1.0
+        with:
+          python-version-file: ".python-version"
+      - name: Install dependencies
+        run: uv sync
+      - name: Create RSS
+        timeout-minutes: 5
+        run: |
+          mkdir -p public
+          uv run main.py config/yamatt.toml public/rss.xml
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: public
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

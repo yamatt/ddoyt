@@ -1,0 +1,67 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/tests.yaml"
+      - "config/test.toml"
+      - "main.py"
+      - "tests/**"
+      - "pyproject.toml"
+      - "uv.lock"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "main.py"
+      - "tests/**"
+      - "pyproject.toml"
+      - "uv.lock"
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Run linter
+    runs-on: ubuntu-slim
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.3.3
+      - name: "Set up Python"
+        uses: actions/setup-python@v7.1.0
+        with:
+          python-version-file: ".python-version"
+      - name: Run static checks
+        run: |
+          uv run ruff check src/ddoyt
+          uv run bandit -r src/ddoyt
+  rss-validator:
+    name: Validate RSS Feed
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.3.3
+      - name: "Set up Python"
+        uses: actions/setup-python@v7.1.0
+        with:
+          python-version-file: ".python-version"
+      - name: Generate RSS feed
+        run: |
+          mkdir -p ./out
+          uv run -m ddor config/test.toml ./out
+      - name: Validate RSS XML structure (Alpine)
+        uses: addnab/docker-run-action@v3
+        with:
+          image: alpine:3.23
+          options: -v ${{ github.workspace }}:/workspace
+          run: |
+            apk add --no-cache libxml2-utils
+            xmllint --noout --schema /workspace/tests/spec/rss_2.0.1.xsd /workspace/out/test.rss || \
+            xmllint --noout /workspace/out/test.rss

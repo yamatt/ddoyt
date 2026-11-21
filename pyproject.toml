@@ -1,0 +1,19 @@
+[project]
+name = "ddoyt"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "click>=8.5.1",
+    "feedgen>=1.0.0",
+    "feedparser>=6.0.14",
+    "httpx>=0.28.1",
+]
+
+[dependency-groups]
+dev = [
+    "bandit>=1.9.4",
+    "pytest>=9.2.0",
+    "ruff>=0.17.6",
+]
