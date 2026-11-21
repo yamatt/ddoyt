@@ -38,8 +38,8 @@ jobs:
           python-version-file: ".python-version"
       - name: Run static checks
         run: |
-          uv run ruff check src/ddoyt
-          uv run bandit -r src/ddoyt
+          uv run ruff check main.py
+          uv run bandit -r main.py
   rss-validator:
     name: Validate RSS Feed
     runs-on: ubuntu-latest
@@ -55,7 +55,7 @@ jobs:
       - name: Generate RSS feed
         run: |
           mkdir -p ./out
-          uv run -m ddor config/test.toml ./out
+          uv run main.py config/test.toml ./out
       - name: Validate RSS XML structure (Alpine)
         uses: addnab/docker-run-action@v3
         with:
