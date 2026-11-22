@@ -92,7 +92,9 @@ def build_rss(all_items: list[dict], feed_meta: dict, output_path: Path) -> None
     fg.description(feed_meta.get("description", "Aggregated YouTube channel feed"))
     fg.language(feed_meta.get("language", "en"))
 
-    sorted_items = sorted(all_items, key=lambda x: x["published"])[:max_items]
+    sorted_items = sorted(all_items, key=lambda x: x["published"], reverse=True)[
+        :max_items
+    ]
 
     for item in sorted_items:
         fe = fg.add_entry()
