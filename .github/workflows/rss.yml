@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - ".github/workflows/rss.yaml"
+      - ".github/workflows/rss.yml"
       - "main.py"
       - "config/*"
   workflow_dispatch:
