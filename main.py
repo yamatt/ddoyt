@@ -131,7 +131,7 @@ def build_rss(all_items: list[dict], feed_meta: dict, output_path: Path) -> None
         fe.description(html_body)
         fe.content(html_body, type="CDATA")
 
-    fg.rss_file(str(output_path), pretty=True)
+    fg.rss_file(str(output_path))
 
 
 @click.command()
