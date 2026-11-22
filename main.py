@@ -157,7 +157,7 @@ def main(config: Path, output: Path) -> None:
         for channel in channels:
             channel_id = channel["id"]
             label = channel.get("name", channel_id)
-            exclude_shorts = channel.get("exclude_shorts", True)
+            exclude_shorts = not channel.get("include_shorts", False)
 
             time.sleep(random.uniform(1.5, 3.0))  # nosec
 
