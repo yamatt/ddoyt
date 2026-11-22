@@ -39,7 +39,7 @@ jobs:
         timeout-minutes: 5
         run: |
           mkdir -p public
-          uv run main.py config/yamatt.toml public/rss.xml
+          uv run main.py config/yamatt.toml public/${{ secrets.UNIQUE_URL_PATH }}/rss.xml
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
