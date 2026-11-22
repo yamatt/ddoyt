@@ -9,6 +9,7 @@ dependencies = [
     "feedgen>=1.0.0",
     "feedparser>=6.0.14",
     "httpx>=0.28.1",
+    "structlog>=26.1.0",
 ]
 
 [dependency-groups]

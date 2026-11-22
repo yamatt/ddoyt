@@ -10,15 +10,22 @@ import feedparser
 import httpx
 from feedgen.feed import FeedGenerator
 
+from logger import log
+
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (compatible; PersonalFeedAggregator/1.0)",
     "Accept": "application/atom+xml, application/xml, text/xml",
 }
 
 
-def get_feed_url(channel_id: str, exclude_shorts: bool) -> str:
+def get_feed_url(channel_id: str, all_videos: bool) -> str:
+    """
+    all_videos includes shorts and live streams
+    """
     target_id = channel_id.strip()
-    if exclude_shorts and target_id.startswith("UC"):
+    if all_videos and target_id.startswith("UC"):
+        target_id = f"UU{target_id[2:]}"
+    else:
         target_id = f"UULF{target_id[2:]}"
 
     param = "playlist_id" if target_id.startswith(("UU", "PL")) else "channel_id"
@@ -28,24 +35,36 @@ def get_feed_url(channel_id: str, exclude_shorts: bool) -> str:
 def fetch_with_retry(client: httpx.Client, url: str, retries: int = 3) -> str | None:
     for attempt in range(1, retries + 1):
         try:
-            resp = client.get(url)
-            if resp.status_code == 200:
-                return resp.text
-            if resp.status_code in {404, 429, 500, 502, 503, 504}:
+            log.info("REQUEST", url=url, attempt=attempt)
+            response = client.get(url)
+            if response.status_code == 200:
+                return response.text
+            if response.status_code in {404, 429, 500, 502, 503, 504}:
                 wait = attempt * random.uniform(3.0, 6.0)  # nosec
-                click.echo(
-                    f"HTTP {resp.status_code} for {url} "
-                    f"(attempt {attempt}/{retries}), retrying in {wait:.1f}s"
+                log.warn(
+                    "REQUEST FAILED",
+                    response_code=response.status_code,
+                    url=url,
+                    attempt=attempt,
+                    retries=retries,
+                    wait=wait,
                 )
                 time.sleep(wait)
                 continue
-            click.echo(f"Non-retryable HTTP {resp.status_code} for {url}", err=True)
+            log.warn(
+                "REQUEST TIMEOUT",
+                url=url,
+                response_code=response.status_code,
+            )
             return None
         except httpx.RequestError as exc:
             wait = attempt * 3.0
-            click.echo(
-                f"Request error for {url}: {exc} "
-                f"(attempt {attempt}/{retries}), retrying in {wait:.1f}s"
+            log.warn(
+                "REQUEST ERROR",
+                url=url,
+                response_code=response.status_code,
+                wait=wait,
+                attempt=attempt,
             )
             time.sleep(wait)
     return None
@@ -154,31 +173,29 @@ def main(config: Path, output: Path) -> None:
     all_items: list[dict] = []
 
     with httpx.Client(headers=HEADERS, timeout=15.0, follow_redirects=True) as client:
+        log.info("GETTING CHANNELS", count=len(channels))
         for channel in channels:
             channel_id = channel["id"]
             label = channel.get("name", channel_id)
-            exclude_shorts = not channel.get("include_shorts", False)
+            include_shorts = channel.get("include_shorts", False)
 
             time.sleep(random.uniform(1.5, 3.0))  # nosec
 
-            url = get_feed_url(channel_id, exclude_shorts)
+            url = get_feed_url(channel_id, all_videos=include_shorts)
             xml_text = fetch_with_retry(client, url)
             if xml_text:
                 entries = parse_entries(xml_text, fallback_name=label)
                 all_items.extend(entries)
-                click.echo(f"Fetched {len(entries)} entries for {label}")
+                log.info("FETCHED", count=len(entries), name=label, url=url)
             else:
-                click.echo(f"Failed to fetch entries for {label}", err=True)
+                log.warn("FETCHED", name=label, url=url)
 
     if not all_items:
         raise click.ClickException(
             "No entries fetched from any channel; aborting write."
         )
-
+    log.info("BUILDING", count=len(all_items))
     build_rss(all_items, feed_meta, output)
-    click.echo(
-        f"Wrote {output} with {min(len(all_items), feed_meta.get('max_items', 50))} items."
-    )
 
 
 if __name__ == "__main__":

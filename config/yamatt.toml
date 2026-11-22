@@ -109,6 +109,7 @@ id = "UCCB1oLQY3XM86ACD05Lq4HQ"
 [[channels]]
 name = "Admiral Gaming"
 id = "UCBNIrcdr-YZ1Gnc4P2fF0TQ"
+include_shorts = true
 
 [[channels]]
 name = "Any Austin"
