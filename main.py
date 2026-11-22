@@ -57,7 +57,7 @@ def fetch_with_retry(client: httpx.Client, url: str, retries: int = 3) -> str | 
                 response_code=response.status_code,
             )
             return None
-        except httpx.RequestError as exc:
+        except httpx.RequestError as error:
             wait = attempt * 3.0
             log.warn(
                 "REQUEST ERROR",
@@ -65,6 +65,7 @@ def fetch_with_retry(client: httpx.Client, url: str, retries: int = 3) -> str | 
                 response_code=response.status_code,
                 wait=wait,
                 attempt=attempt,
+                error=error,
             )
             time.sleep(wait)
     return None
